@@ -1,0 +1,12 @@
+custom_name: Keyword "super"
+content:
+  - Theory
+  - Bank account
+  - Inheritance and constructor usage in pet namespace
+  - When the keyword is used
+  - Employees
+  - Implementing inheritance in object creation
+  - Calling parent class constructor in derived class
+  - Accessing constructors of a base class
+  - Extended classes
+  - Fix the non-compiled hierarchy
