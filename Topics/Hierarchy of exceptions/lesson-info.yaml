@@ -1,5 +1,9 @@
 content:
-  - Theory
   - BadRequestException
-  - Unchecked exceptions
-  - Overview the hierarchy
+  - Theory (1)
+  - Checked exceptions
+  - Overview the hierarchy (1)
+  - Unchecked exceptions (1)
+  - Catching specific and general exceptions
+  - Overview the hierarchy (2)
+  - Base class
