@@ -1,5 +1,7 @@
 package battleship;
 
+import java.util.Scanner;
+
 public class Main {
 
     static final char FOG_OF_WAR = '~';
@@ -13,8 +15,62 @@ public class Main {
     static final int HEADER = 1;
 
     public static void main(String[] args) {
+
+        Scanner input = new Scanner(System.in);
+
         char [][] battleField = CreateEmptyField();
 
+        placeShips(battleField, input);
+    }
+
+    private static void placeShips(char[][] battleField, Scanner input) {
+        boolean isConsecutive = false;
+        int lenght = 0;
+        StringBuilder progression = new StringBuilder();
+
+        System.out.println("Enter the coordinates of the ship:");
+        String begin = input.next();
+        String end = input.next();
+
+        if ((begin.charAt(0) == end.charAt(0)) || (begin.charAt(1) == end.charAt(1))) {
+            isConsecutive = true;
+        }
+
+        if (
+               isConsecutive
+            && (Character.getNumericValue(begin.charAt(1)) > 0)
+                        && (Character.getNumericValue(end.charAt(1)) < 11)
+        ) {
+                lenght = (Math.abs(Integer.parseInt(begin.substring(1)) -
+                    Integer.parseInt(end.substring(1)))) + 1;
+        } else {
+            System.out.println("Error!");
+            return;
+        }
+
+        int firstColumn = Character.getNumericValue(begin.charAt(1));
+        int lastColumn = Character.getNumericValue(end.charAt(1));
+
+        if (firstColumn < lastColumn) {
+            for (int i = firstColumn; i <= lastColumn; i++) {
+                progression.append
+                        (begin.charAt(0)).
+                        append(i).
+                        append(" ");
+            }
+        } else {
+            for (int i = firstColumn; i >= lastColumn; i--) {
+                progression.append
+                        (end.charAt(0)).
+                        append(i).
+                        append(" ");
+            }
+        }
+
+        progression.deleteCharAt(progression.length() - 1);
+
+        System.out.printf("Length: %d\n", lenght);
+        System.out.printf("Parts: %s%n", progression);
     }
 
     private static char[][] CreateEmptyField() {
