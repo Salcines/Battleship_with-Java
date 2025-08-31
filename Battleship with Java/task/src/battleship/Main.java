@@ -24,53 +24,57 @@ public class Main {
     }
 
     private static void placeShips(char[][] battleField, Scanner input) {
-        boolean isConsecutive = false;
-        int lenght = 0;
-        StringBuilder progression = new StringBuilder();
-
         System.out.println("Enter the coordinates of the ship:");
-        String begin = input.next();
-        String end = input.next();
 
-        if ((begin.charAt(0) == end.charAt(0)) || (begin.charAt(1) == end.charAt(1))) {
-            isConsecutive = true;
-        }
+        String begin = input.next().toUpperCase();
+        String end = input.next().toUpperCase();
 
-        if (
-               isConsecutive
-            && (Character.getNumericValue(begin.charAt(1)) > 0)
-                        && (Character.getNumericValue(end.charAt(1)) < 11)
-        ) {
-                lenght = (Math.abs(Integer.parseInt(begin.substring(1)) -
-                    Integer.parseInt(end.substring(1)))) + 1;
-        } else {
+        char startRow = begin.charAt(0);
+        int startCol = Integer.parseInt(begin.substring(1));
+        char endRow = end.charAt(0);
+        int endCol = Integer.parseInt(end.substring(1));
+
+        if (isInvalidCoordinate(startRow, startCol) || isInvalidCoordinate(endRow, endCol)) {
             System.out.println("Error!");
             return;
         }
 
-        int firstColumn = Character.getNumericValue(begin.charAt(1));
-        int lastColumn = Character.getNumericValue(end.charAt(1));
-
-        if (firstColumn < lastColumn) {
-            for (int i = firstColumn; i <= lastColumn; i++) {
-                progression.append
-                        (begin.charAt(0)).
-                        append(i).
-                        append(" ");
-            }
-        } else {
-            for (int i = firstColumn; i >= lastColumn; i--) {
-                progression.append
-                        (end.charAt(0)).
-                        append(i).
-                        append(" ");
-            }
+        boolean sameRow = startRow == endRow;
+        boolean sameCol = startCol == endCol;
+        if (!(sameRow || sameCol)) {
+            System.out.println("Error!");
+            return;
         }
+
+        int length = sameRow ? Math.abs(startCol - endCol) + 1 :
+                Math.abs(startRow - endRow) + 1;
+
+        StringBuilder progression = new StringBuilder();
+
+       if (sameRow) {
+           int firstPosition = Math.min(startCol, endCol);
+           int lastPosition = Math.max(startCol, endCol);
+
+           for (int col = firstPosition; col <= lastPosition; col++) {
+               progression.append(startRow).append(col).append(" ");
+           }
+       }  else {
+           char firstPosition = (char) Math.min(startRow, endRow);
+           char lastPosition = (char) Math.max(startRow, endRow);
+
+           for (char row = firstPosition; row <= lastPosition; row++) {
+               progression.append(row).append(startCol).append(" ");
+           }
+       }
 
         progression.deleteCharAt(progression.length() - 1);
 
-        System.out.printf("Length: %d\n", lenght);
+        System.out.printf("Length: %d\n", length);
         System.out.printf("Parts: %s%n", progression);
+    }
+
+    private static boolean isInvalidCoordinate(char row, int column) {
+        return row < 'A' || row > 'J' || column < 1 || column > COLUMNS_FIELD;
     }
 
     private static char[][] CreateEmptyField() {
@@ -81,6 +85,7 @@ public class Main {
         for (int i = 1; i < battleField.length; i++ ) {
             battleField[0][i] = Character.forDigit(i, 10);
             if (i == 10) {
+                // If the column is 10, we put a 1 in position 11 and 0 in position 12
                 int number = 0;
                 battleField[0][i] = Character.forDigit(number + 1, 10);
                 battleField[0][i + 1] = Character.forDigit(number, 10);
