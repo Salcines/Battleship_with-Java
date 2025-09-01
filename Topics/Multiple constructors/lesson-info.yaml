@@ -1,7 +1,14 @@
 content:
-  - Theory
   - Time
   - "Suppose, you have a class"
-  - Creating a Student class with multiple constructors
-  - Understanding constructor overloading in a Circle class
   - Employee
+  - Theory (1)
+  - Class instantiation
+  - Entanglement
+  - Creating a Student class with multiple constructors (1)
+  - Understanding constructor overloading in a Circle class (1)
+  - Time (1)
+  - Employee (1)
+  - Phone
+  - About constructors
+  - "Suppose, you have a class (1)"
