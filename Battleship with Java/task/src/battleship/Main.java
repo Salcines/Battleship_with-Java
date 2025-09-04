@@ -2,6 +2,29 @@ package battleship;
 
 import java.util.Scanner;
 
+enum Ships{
+    AIRCRAFT(5, "Aircraft Carrier"),
+    BATTLESHIP(4, "Battleship"),
+    SUBMARINE(3, "Submarine"),
+    CRUISER(3, "Cruiser"),
+    DESTROYER(2, "Destroyer");
+
+    private final int position;
+    private final String name;
+
+    Ships(int position, String name){
+        this.position = position;
+        this.name = name;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+    public String getName() {
+        return name;
+    }
+
+}
 public class Main {
 
     static final char FOG_OF_WAR = '~';
@@ -24,10 +47,15 @@ public class Main {
     }
 
     private static void placeShips(char[][] battleField, Scanner input) {
-        System.out.println("Enter the coordinates of the ship:");
+        String begin = null;
+        String end = null;
+        for (Ships ship : Ships.values()) {
+            System.out.printf("Enter the coordinates of the %s (%d cells):%n",
+                    ship.getName(), ship.getPosition());
 
-        String begin = input.next().toUpperCase();
-        String end = input.next().toUpperCase();
+            begin = input.next().toUpperCase();
+            end = input.next().toUpperCase();
+        }
 
         char startRow = begin.charAt(0);
         int startCol = Integer.parseInt(begin.substring(1));
