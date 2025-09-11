@@ -2,7 +2,7 @@ package battleship;
 
 import java.util.Scanner;
 
-enum Ships{
+enum Ships {
     AIRCRAFT(5, "Aircraft Carrier"),
     BATTLESHIP(4, "Battleship"),
     SUBMARINE(3, "Submarine"),
@@ -12,7 +12,7 @@ enum Ships{
     private final int position;
     private final String name;
 
-    Ships(int position, String name){
+    Ships(int position, String name) {
         this.position = position;
         this.name = name;
     }
@@ -20,15 +20,17 @@ enum Ships{
     public int getPosition() {
         return position;
     }
+
     public String getName() {
         return name;
     }
 
 }
+
 public class Main {
 
     static final char FOG_OF_WAR = '~';
-    static final char CELL_WITH_SHIP = '0';
+    static final char CELL_WITH_SHIP = 'O';
     static final char HIT = 'X';
     static final char MISS = 'M';
 
@@ -41,43 +43,69 @@ public class Main {
 
         Scanner input = new Scanner(System.in);
 
-        char [][] battleField = CreateEmptyField();
+        char[][] battleField = CreateEmptyField();
 
         placeShips(battleField, input);
     }
 
     private static void placeShips(char[][] battleField, Scanner input) {
-        String begin = null;
-        String end = null;
         for (Ships ship : Ships.values()) {
-            System.out.printf("Enter the coordinates of the %s (%d cells):%n",
+            System.out.printf("Enter the coordinates of the %s (%d cells):%n%n",
                     ship.getName(), ship.getPosition());
 
-            begin = input.next().toUpperCase();
-            end = input.next().toUpperCase();
+            checkPosition(battleField, input, ship);
+
+            //TODO: Check the overlapping for two or more ships
+
+            PrintBattleField(battleField);
         }
 
-        char startRow = begin.charAt(0);
-        int startCol = Integer.parseInt(begin.substring(1));
-        char endRow = end.charAt(0);
-        int endCol = Integer.parseInt(end.substring(1));
+    }
+
+    private static void checkPosition(char[][] battleField, Scanner input, Ships ship) {
+
+        boolean notValid = true;
+        char adjustAscii = 64;
+        String begin;
+        String end;
+        char startRow;
+        int startCol;
+        char endRow;
+        int endCol;
+        boolean sameRow = false;
+        boolean sameCol;
+
+        do {
+            begin = input.next().toUpperCase();
+            end = input.next().toUpperCase();
+            startRow = begin.charAt(0);
+            startCol = Integer.parseInt(begin.substring(1));
+            endRow = end.charAt(0);
+            endCol = Integer.parseInt(end.substring(1));
 
         if (isInvalidCoordinate(startRow, startCol) || isInvalidCoordinate(endRow, endCol)) {
             System.out.println("Error!");
             return;
         }
 
-        boolean sameRow = startRow == endRow;
-        boolean sameCol = startCol == endCol;
-        if (!(sameRow || sameCol)) {
-            System.out.println("Error!");
-            return;
-        }
+            sameRow = startRow == endRow;
+            sameCol = startCol == endCol;
 
-        int length = sameRow ? Math.abs(startCol - endCol) + 1 :
-                Math.abs(startRow - endRow) + 1;
+            if (!(sameRow || sameCol)) {
+                System.out.printf("%nError! Wrong ship location! Try again:%n");
+                continue;
+            }
 
-        StringBuilder progression = new StringBuilder();
+            int length = sameRow ? Math.abs(startCol - endCol) + 1 :
+                    Math.abs(startRow - endRow) + 1;
+            if (length != ship.getPosition()) {
+                System.out.printf("%nError! Wrong length of the %s! Try again:%n",
+                        ship.getName());
+                continue;
+            }
+
+            notValid = false;
+        } while (notValid);
 
        if (sameRow) {
            int firstPosition = Math.min(startCol, endCol);
@@ -90,15 +118,22 @@ public class Main {
            char firstPosition = (char) Math.min(startRow, endRow);
            char lastPosition = (char) Math.max(startRow, endRow);
 
-           for (char row = firstPosition; row <= lastPosition; row++) {
-               progression.append(row).append(startCol).append(" ");
-           }
-       }
+            for (char row = firstPosition; row <= lastPosition; row++) {
+                battleField[row - adjustAscii][startCol] = CELL_WITH_SHIP;
+            }
+        }
+    }
 
-        progression.deleteCharAt(progression.length() - 1);
+    private static boolean isAdjacentShip(char row,
+                                          int column,
+                                          char[][] battleField) {
 
-        System.out.printf("Length: %d\n", length);
-        System.out.printf("Parts: %s%n", progression);
+        int actualRow = row - 64;
+
+        return (actualRow > 0 && battleField[actualRow - 1][column] == CELL_WITH_SHIP) ||
+                (actualRow < battleField.length - 1 && battleField[actualRow + 1][column] == CELL_WITH_SHIP)
+                || (column > 0 && battleField[actualRow][column - 1] == CELL_WITH_SHIP)
+                || (column < COLUMNS_FIELD && battleField[actualRow][column + 1] == CELL_WITH_SHIP);
     }
 
     private static boolean isInvalidCoordinate(char row, int column) {
@@ -107,10 +142,10 @@ public class Main {
 
     private static char[][] CreateEmptyField() {
         char column = 64;
-        char [][] battleField = new char[FILES_FIELD + HEADER][COLUMNS_FIELD + HEADER + 1];
+        char[][] battleField = new char[FILES_FIELD + HEADER][COLUMNS_FIELD + HEADER + 1];
         battleField[0][0] = ' ';
 
-        for (int i = 1; i < battleField.length; i++ ) {
+        for (int i = 1; i < battleField.length; i++) {
             battleField[0][i] = Character.forDigit(i, 10);
             if (i == 10) {
                 // If the column is 10, we put a 1 in position 11 and 0 in position 12
@@ -120,12 +155,12 @@ public class Main {
                 break;
             }
         }
-        for (int i = 1; i < battleField.length; i++ ) {
+        for (int i = 1; i < battleField.length; i++) {
             battleField[i][0] = (char) (i + column);
         }
 
         for (int i = 1; i < battleField.length; i++) {
-            for  (int j = 1; j < battleField[i].length - 1; j++) {
+            for (int j = 1; j < battleField[i].length - 1; j++) {
                 battleField[i][j] = FOG_OF_WAR;
             }
         }
@@ -147,5 +182,6 @@ public class Main {
             }
             System.out.println();
         }
+        System.out.println();
     }
 }
