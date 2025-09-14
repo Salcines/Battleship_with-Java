@@ -2,7 +2,7 @@ package battleship;
 
 import java.util.Scanner;
 
-//region List of ships and tis length
+//region List of ships and its length
 enum Ships {
     AIRCRAFT(5, "Aircraft Carrier"),
     BATTLESHIP(4, "Battleship"),
@@ -49,7 +49,9 @@ public class Main {
 
         Scanner input = new Scanner(System.in);
 
-        char[][] battleField = CreateEmptyField();
+        char[][] battleField = createEmptyField();
+
+        printBattleField(battleField);
 
         placeShips(battleField, input);
 
@@ -79,8 +81,10 @@ public class Main {
         boolean notValid = true;
         char row;
         int column;
+        char[][] playerField = createEmptyField();
+
         System.out.printf("%nThe game starts!%n%n");
-        printBattleField(battleField);
+        printBattleField(playerField);
 
         System.out.printf("%nTake a shot!%n%n");
 
@@ -99,12 +103,19 @@ public class Main {
 
         if (battleField[row - ADJUSTASCII][column] == CELL_WITH_SHIP) {
             battleField[row - ADJUSTASCII][column] = HIT;
+            playerField[row - ADJUSTASCII][column] = HIT;
+
+            printBattleField(playerField);
+
+            System.out.printf("%nYou hit a ship!%n%n");
             printBattleField(battleField);
-            System.out.printf("%nYou hit a ship!");
         } else {
             battleField[row - ADJUSTASCII][column] = MISS;
+            playerField[row - ADJUSTASCII][column] = MISS;
+            printBattleField(playerField);
+
+            System.out.printf("%nYou missed!%n%n");
             printBattleField(battleField);
-            System.out.printf("%nYou missed!");
         }
     }
 //endregion
@@ -130,17 +141,17 @@ public class Main {
             endRow = end.charAt(0);
             endCol = Integer.parseInt(end.substring(1));
 
-        if (isInvalidCoordinate(startRow, startCol) || isInvalidCoordinate(endRow, endCol)) {
-            System.out.println("Error!");
-            continue;
-        }
+            if (isInvalidCoordinate(startRow, startCol) || isInvalidCoordinate(endRow, endCol)) {
+                System.out.println("Error!");
+                continue;
+            }
 
-        if (isAdjacentShip(startRow, startCol, battleField) ||
-                isAdjacentShip(endRow, endCol, battleField)) {
-            System.out.printf
-                    ("%nError! You placed it too close to another one. Try again:%n\n");
-            continue;
-        }
+            if (isAdjacentShip(startRow, startCol, battleField) ||
+                    isAdjacentShip(endRow, endCol, battleField)) {
+                System.out.printf
+                        ("%nError! You placed it too close to another one. Try again:%n\n");
+                continue;
+            }
 
             sameRow = startRow == endRow;
             sameCol = startCol == endCol;
@@ -161,16 +172,16 @@ public class Main {
             notValid = false;
         } while (notValid);
 
-       if (sameRow) {
-           int firstPosition = Math.min(startCol, endCol);
-           int lastPosition = Math.max(startCol, endCol);
+        if (sameRow) {
+            int firstPosition = Math.min(startCol, endCol);
+            int lastPosition = Math.max(startCol, endCol);
 
-           for (int col = firstPosition; col <= lastPosition; col++) {
-               battleField[startRow - ADJUSTASCII][col] = CELL_WITH_SHIP;
-           }
-       }  else {
-           char firstPosition = (char) Math.min(startRow, endRow);
-           char lastPosition = (char) Math.max(startRow, endRow);
+            for (int col = firstPosition; col <= lastPosition; col++) {
+                battleField[startRow - ADJUSTASCII][col] = CELL_WITH_SHIP;
+            }
+        } else {
+            char firstPosition = (char) Math.min(startRow, endRow);
+            char lastPosition = (char) Math.max(startRow, endRow);
 
             for (char row = firstPosition; row <= lastPosition; row++) {
                 battleField[row - ADJUSTASCII][startCol] = CELL_WITH_SHIP;
@@ -199,8 +210,7 @@ public class Main {
     //endregion
 
     //region Create empty battlefield. Final method
-    private static char[][] CreateEmptyField() {
-        char column = 64;
+    private static char[][] createEmptyField() {
         char[][] battleField = new char[FILES_FIELD + HEADER][COLUMNS_FIELD + HEADER + 1];
         battleField[0][0] = ' ';
 
@@ -215,7 +225,7 @@ public class Main {
             }
         }
         for (int i = 1; i < battleField.length; i++) {
-            battleField[i][0] = (char) (i + column);
+            battleField[i][0] = (char) (i + ADJUSTASCII);
         }
 
         for (int i = 1; i < battleField.length; i++) {
@@ -224,7 +234,7 @@ public class Main {
             }
         }
 
-        printBattleField(battleField);
+        //printBattleField(battleField);
 
         return battleField;
     }
