@@ -9,6 +9,9 @@ programming_language: Java
 programming_language_version: 11
 content:
   - Battleship with Java
-  - Topics (1)
+  - Topics (6)
+additional_files:
+  - name: build.gradle
+  - name: settings.gradle
 mode: Study
 yaml_version: 4
