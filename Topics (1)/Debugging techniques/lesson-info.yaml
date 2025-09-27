@@ -1,0 +1,12 @@
+content:
+  - Theory
+  - Implementing error handling for division by zero operation
+  - Debugging an Arithmetic Exception with Logging
+  - Handling and logging null pointer exceptions
+  - Log events
+  - Development approach
+  - Assertion
+  - Checking the argument
+  - Find the error
+  - Different techniques
+  - Proper tools
