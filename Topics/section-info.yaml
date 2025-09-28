@@ -1,6 +1,2 @@
 content:
-  - Multiple constructors
-  - Keyword  super
-  - Combining constants with enum
-  - Debugging techniques
-  - Hierarchy of exceptions
+  - Processing strings
