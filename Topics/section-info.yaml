@@ -2,3 +2,4 @@ content:
   - Processing strings
   - Floating-point types and operations
   - Break and continue. Branching
+  - Iterating over arrays
