@@ -13,3 +13,4 @@ content:
   - Compression algorithm
   - Cutting out the middle of a string
   - Piece of alphabet
+  - Move the first N characters
