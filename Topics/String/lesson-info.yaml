@@ -1,0 +1,17 @@
+content:
+  - Theory
+  - Extracting a character
+  - Operations with strings
+  - Operations with substrings
+  - Java as a string
+  - Comparing strings
+  - Extracting a specific character from a greeting message
+  - Calling basic methods
+  - Extracting a substring
+  - Check prefix ignoring the case
+  - Check burgs
+  - Replacing 'a' with 'b'
+  - Finding string expressions
+  - Comparing strings ignoring whitespaces
+  - Extracting the first character from a string
+  - Fixing code to display a character from a string
