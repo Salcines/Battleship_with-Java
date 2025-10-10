@@ -7,3 +7,4 @@ content:
   - Static members
   - Exception handling
   - String
+  - Initializing new instances. Constructor
