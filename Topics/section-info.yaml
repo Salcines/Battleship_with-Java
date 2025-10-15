@@ -10,3 +10,4 @@ content:
   - Initializing new instances. Constructor
   - Getters and setters
   - Printing data
+  - NullPointerException
