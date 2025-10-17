@@ -11,3 +11,4 @@ content:
   - Getters and setters
   - Printing data
   - NullPointerException
+  - Grouping classes with packages
