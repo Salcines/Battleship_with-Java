@@ -75,16 +75,16 @@ public class Main {
 
         Scanner input = new Scanner(System.in);
 
-        char[][] battleField = createEmptyField();
+        Cell[][] battleField = createEmptyField();
 
         printBattleField(battleField);
 
-        placeShips(battleField, input);
+        //placeShips(battleField, input);
 
-        beginGame(battleField, input);
+        //beginGame(battleField, input);
     }
 
-    //region place the ships. Final method
+   /* //region place the ships. Final method
 
     private static void placeShips(char[][] battleField, Scanner input) {
         for (Ships ship : Ships.values()) {
@@ -107,7 +107,7 @@ public class Main {
         boolean notValid = true;
         char row;
         int column;
-        char[][] playerField = createEmptyField();
+        Cell[][] playerField = createEmptyField();
 
         System.out.printf("%nThe game starts!%n%n");
         printBattleField(playerField);
@@ -233,53 +233,39 @@ public class Main {
     private static boolean isInvalidCoordinate(char row, int column) {
         return row < 'A' || row > 'J' || column < 1 || column > COLUMNS_FIELD;
     }
-    //endregion
+    //endregion*/
 
-    //region Create empty battlefield. Final method
-    private static char[][] createEmptyField() {
-        char[][] battleField = new char[FILES_FIELD + HEADER][COLUMNS_FIELD + HEADER + 1];
-        battleField[0][0] = ' ';
+    //region Creates empty battlefield. Final method
+    private static Cell[][] createEmptyField() {
 
-        for (int i = 1; i < battleField.length; i++) {
-            battleField[0][i] = Character.forDigit(i, 10);
-            if (i == 10) {
-                // If the column is 10, we put a 1 in position 11 and 0 in position 12
-                int number = 0;
-                battleField[0][i] = Character.forDigit(number + 1, 10);
-                battleField[0][i + 1] = Character.forDigit(number, 10);
-                break;
+        Cell[][] battleField = new Cell[FILES_FIELD][COLUMNS_FIELD];
+
+        for (Cell[] row : battleField)
+            for (int j = 0; j < COLUMNS_FIELD; j++) {
+                row[j] = Cell.FOG;
             }
-        }
-        for (int i = 1; i < battleField.length; i++) {
-            battleField[i][0] = (char) (i + ADJUSTASCII);
-        }
-
-        for (int i = 1; i < battleField.length; i++) {
-            for (int j = 1; j < battleField[i].length - 1; j++) {
-                battleField[i][j] = FOG_OF_WAR;
-            }
-        }
-
-        //printBattleField(battleField);
-
         return battleField;
     }
-    //endregion. M
+    //endregion
 
     //region print battlefield. Final method
-    private static void printBattleField(char[][] battleField) {
-        for (int i = 0; i < battleField.length; i++) {
-            for (int j = 0; j < battleField[i].length - 1; j++) {
-                System.out.print(battleField[i][j]);
-                if (i == 0 && j == 10) {
-                    System.out.print(battleField[i][j + 1]);
-                    continue;
-                }
-                System.out.print(' ');
+    private static void printBattleField(Cell[][] battleField) {
+        System.out.print(" ");
+
+        for (int i = 1; i <= COLUMNS_FIELD; i++) {
+            System.out.printf("%d ", i);
+        }
+        System.out.println();
+
+        for (int i = 0; i < FILES_FIELD; i++) {
+            char letter = (char) ('A' + i);
+            System.out.printf("%s ", letter);
+
+            for (int j = 0; j < COLUMNS_FIELD; j++) {
+                System.out.printf("%c ", battleField[i][j].getSymbol());
             }
             System.out.println();
         }
-        System.out.println();
     }
     //endregion
 }
