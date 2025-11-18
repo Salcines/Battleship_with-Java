@@ -2,7 +2,6 @@ package battleship;
 
 import java.util.Scanner;
 
-//region List of ships and its length
 enum Ships {
     AIRCRAFT(5, "Aircraft Carrier"),
     BATTLESHIP(4, "Battleship"),
@@ -12,10 +11,21 @@ enum Ships {
 
     private final int length;
     private final String name;
+    private int hits;
+    private boolean sunk;
 
     Ships(int length, String name) {
         this.length = length;
         this.name = name;
+        this.hits = 0;
+    }
+
+    public void hit () {
+        this.hits++;
+    }
+
+    public boolean isSunk() {
+        return hits >= length;
     }
 
     public int getLength() {
@@ -27,7 +37,23 @@ enum Ships {
     }
 
 }
-//endregion
+
+enum Cell {
+    FOG('~'),
+    HIT('X'),
+    MISS('M'),
+    SHIP('O');
+
+    private final char symbol;
+
+    Cell(char symbol) {
+        this.symbol = symbol;
+    }
+
+    public char getSymbol() {
+        return symbol;
+    }
+}
 
 public class Main {
 

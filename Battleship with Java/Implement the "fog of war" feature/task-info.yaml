@@ -7,8 +7,5 @@ files:
     visible: false
     learner_created: false
 feedback_link: https://hyperskill.org/projects/383/stages/2284/implement#comment
-status: Solved
-feedback:
-  message: Congratulations!
-  time: "Sun, 14 Sep 2025 21:42:04 UTC"
-record: -1
+status: Unchecked
+record: 5
