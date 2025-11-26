@@ -5,5 +5,5 @@ content:
   - Add shooting functionality
   - Implement the "fog of war" feature
   - Define rules to end the game
-  - Add multiplayer option
-current_task: 3
+  - Add multiplayer option (1)
+current_task: 4

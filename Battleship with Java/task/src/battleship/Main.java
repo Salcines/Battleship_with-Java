@@ -1,5 +1,8 @@
 package battleship;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 enum Ships {
@@ -57,199 +60,219 @@ enum Cell {
 
 public class Main {
 
-    //region final variables
-    static final char FOG_OF_WAR = '~';
-    static final char CELL_WITH_SHIP = 'O';
-    static final char HIT = 'X';
-    static final char MISS = 'M';
+    //region constant variables
 
     static final int FILES_FIELD = 10;
     static final int COLUMNS_FIELD = 10;
-
-    static final int HEADER = 1;
-
-    static final char ADJUSTASCII = 64;
+    static final Ships[][] SHIPS_GRID = new Ships[FILES_FIELD] [COLUMNS_FIELD];
+    static final List<Ships> SUNK_SHIPS = new ArrayList<>();
     //endregion
 
     public static void main(String[] args) {
 
         Scanner input = new Scanner(System.in);
 
-        Cell[][] battleField = createEmptyField();
+        Cell[][] battlefield = createEmptyField();
+        Cell[][] preparationfield = createEmptyField();
 
-        printBattleField(battleField);
+        printBattleField(preparationfield);
 
-        //placeShips(battleField, input);
-
-        //beginGame(battleField, input);
-    }
-
-   /* //region place the ships. Final method
-
-    private static void placeShips(char[][] battleField, Scanner input) {
         for (Ships ship : Ships.values()) {
             System.out.printf("Enter the coordinates of the %s (%d cells):%n%n",
                     ship.getName(), ship.getLength());
-
-            checkPosition(battleField, input, ship);
-
-            //TODO: Check the overlapping for two or more ships
-
-            printBattleField(battleField);
+            placeShips(preparationfield, input, ship);
+            SUNK_SHIPS.add(ship);
         }
 
+        beginGame(preparationfield, battlefield, input);
     }
-    //endregion
 
-    //region take a shoot. The game ends after first shot.
-    private static void beginGame(char[][] battleField, Scanner input) {
+    private static void beginGame(Cell[][] preparationfield,
+                                  Cell[][] battlefield, Scanner input) {
+        System.out.println("The game starts!\n");
+        //printBattleField(preparationfield);
+        List<Ships> sunkShips;
+        takeShot(preparationfield, battlefield, input);
+    }
 
-        boolean notValid = true;
-        char row;
-        int column;
-        Cell[][] playerField = createEmptyField();
-
-        System.out.printf("%nThe game starts!%n%n");
-        printBattleField(playerField);
-
-        System.out.printf("%nTake a shot!%n%n");
-
+    private static void takeShot(Cell[][] preparationfield,
+                                 Cell[][] battlefield, Scanner input) {
+        //Cell[][] battlefield = createEmptyField();
+        System.out.println("\nTake a shot:\n");
+        printBattleField(battlefield);
         do {
             String coordinate = input.next().toUpperCase();
-            row = coordinate.charAt(0);
-            column = Integer.parseInt(coordinate.substring(1));
+            int row = coordinate.charAt(0) - 'A';
+            int column = Integer.parseInt
+                    (coordinate.substring(1)) - 1;
 
-            if (isInvalidCoordinate(row, column)) {
-                System.out.printf
-                        ("%nError! You entered the wrong coordinates! Try again:%n%n");
+            // region Check if the player has already shot here (code comment)
+            if (battlefield[row][column] == Cell.HIT ||
+                    battlefield[row][column] == Cell.MISS) {
+                System.out.println("You have already shot here!");
                 continue;
+
             }
-            notValid = false;
-        } while (notValid);
+            //endregion
 
-        if (battleField[row - ADJUSTASCII][column] == CELL_WITH_SHIP) {
-            battleField[row - ADJUSTASCII][column] = HIT;
-            playerField[row - ADJUSTASCII][column] = HIT;
+            if (preparationfield[row][column] == Cell.SHIP) {
+                Ships ship = SHIPS_GRID[row][column];
+                battlefield[row][column] = Cell.HIT;
+                ship.hit();
 
-            printBattleField(playerField);
+                printBattleField(battlefield);
 
-            System.out.printf("%nYou hit a ship!%n%n");
-            printBattleField(battleField);
-        } else {
-            battleField[row - ADJUSTASCII][column] = MISS;
-            playerField[row - ADJUSTASCII][column] = MISS;
-            printBattleField(playerField);
+                if (ship.isSunk()) {
+                    if (isAllShipsSunk()) {
+                        System.out.println("You sank the last ship. You won. ");
+                        System.out.println("Congratulations!");
+                    } else {
+                        System.out.println("You sank a ship. Specify a new target:");
+                    }
+                } else {
+                    System.out.println("You hit a ship. Try again:");
+                }
+            } else {
+                battlefield[row][column] = Cell.MISS;
+                printBattleField(battlefield);
+                System.out.println("You missed. Try again:");
+            }
 
-            System.out.printf("%nYou missed!%n%n");
-            printBattleField(battleField);
-        }
+        } while (!isAllShipsSunk());
     }
-//endregion
 
-    //region chcek positions (valid input, lenght and position)
-    private static void checkPosition(char[][] battleField, Scanner input, Ships ship) {
+    private static boolean isAllShipsSunk() {
+        for (Ships ship : SUNK_SHIPS) {
+            if (!ship.isSunk()) {
+                return false;
+            }
+        }
+        return true;
+    }
 
-        boolean notValid = true;
-        String begin;
-        String end;
-        char startRow;
-        int startCol;
-        char endRow;
-        int endCol;
-        boolean sameRow = false;
-        boolean sameCol;
+    //region place the ships. Final method
+    private static void placeShips(Cell[][] preparationfield, Scanner input, Ships ship) {
+        boolean validCoordinates = false;
 
-        do {
-            begin = input.next().toUpperCase();
-            end = input.next().toUpperCase();
-            startRow = begin.charAt(0);
-            startCol = Integer.parseInt(begin.substring(1));
-            endRow = end.charAt(0);
-            endCol = Integer.parseInt(end.substring(1));
+        while (!validCoordinates) {
+            String beginCoordinate = input.next().toUpperCase();
+            String endCoordinate = input.next().toUpperCase();
 
-            if (isInvalidCoordinate(startRow, startCol) || isInvalidCoordinate(endRow, endCol)) {
+            int rowInitial = beginCoordinate.charAt(0) -'A';
+            int columnInitial = Integer.parseInt
+                    (beginCoordinate.substring(1)) - 1;
+            int rowFinal = endCoordinate.charAt(0) - 'A';
+            int columnFinal = Integer.parseInt
+                    (endCoordinate.substring(1)) - 1;
+
+            //Basic validation
+            if (isOutBounds (rowInitial, columnInitial)
+                    || isOutBounds(rowFinal, columnFinal)) {
                 System.out.println("Error!");
                 continue;
+                
             }
 
-            if (isAdjacentShip(startRow, startCol, battleField) ||
-                    isAdjacentShip(endRow, endCol, battleField)) {
-                System.out.printf
-                        ("%nError! You placed it too close to another one. Try again:%n\n");
+            boolean sameRow = rowInitial == rowFinal;
+            boolean sameColumn = columnInitial == columnFinal;
+
+            if (!(sameRow || sameColumn)) {
+                System.out.println("Error! Wrong ship location! Try again:\n");
                 continue;
             }
 
-            sameRow = startRow == endRow;
-            sameCol = startCol == endCol;
+            //Length validation
+            int length = sameRow ?
+                    Math.abs(columnFinal - columnInitial) + 1 :
+                    Math.abs(rowFinal - rowInitial) + 1;
 
-            if (!(sameRow || sameCol)) {
-                System.out.printf("%nError! Wrong ship location! Try again:%n%n");
-                continue;
-            }
-
-            int length = sameRow ? Math.abs(startCol - endCol) + 1 :
-                    Math.abs(startRow - endRow) + 1;
             if (length != ship.getLength()) {
-                System.out.printf("%nError! Wrong length of the %s! Try again:%n%n",
+                System.out.printf("\nError! Wrong length of the %s! Try again:\n\n",
                         ship.getName());
                 continue;
             }
 
-            notValid = false;
-        } while (notValid);
+            //Normalize the coordinates
+            int startColumn = Math.min(columnInitial, columnFinal);
+            int lastColumn = Math.max(columnInitial, columnFinal);
+            int startRow = Math.min(rowInitial, rowFinal);
+            int lastRow = Math.max(rowInitial, rowFinal);
 
-        if (sameRow) {
-            int firstPosition = Math.min(startCol, endCol);
-            int lastPosition = Math.max(startCol, endCol);
-
-            for (int col = firstPosition; col <= lastPosition; col++) {
-                battleField[startRow - ADJUSTASCII][col] = CELL_WITH_SHIP;
+            if (isToCloseOrOverlap
+                    (preparationfield,
+                            startRow, lastRow,
+                            startColumn, lastColumn)) {
+                System.out.print
+                        ("\nError! You placed it too close to another one. Try again:\n\n");
+                continue;
             }
-        } else {
-            char firstPosition = (char) Math.min(startRow, endRow);
-            char lastPosition = (char) Math.max(startRow, endRow);
 
-            for (char row = firstPosition; row <= lastPosition; row++) {
-                battleField[row - ADJUSTASCII][startCol] = CELL_WITH_SHIP;
+            if (sameRow) {
+                for (int col = startColumn; col <= lastColumn; col++) {
+                    preparationfield[startRow][col] = Cell.SHIP;
+                    SHIPS_GRID[startRow][col] = ship;
+                }
+            } else {
+                for (int row = startRow; row <= lastRow; row++) {
+                    preparationfield[row][startColumn] = Cell.SHIP;
+                    SHIPS_GRID[row][startColumn] = ship;
+                }
+            }
+            validCoordinates = true;
+        }
+
+        printBattleField(preparationfield);
+    }
+
+    private static boolean isToCloseOrOverlap(Cell[][] preparationfield,
+                                              int startRow, int lastRow,
+                                              int startColumn, int lastColumn) {
+        int initialRow = Math.max(0, startRow - 1);
+        int finalRow = Math.min(FILES_FIELD - 1, lastRow + 1);
+        int initialColumn = Math.max(0, startColumn - 1);
+        int finalColumn = Math.min(COLUMNS_FIELD - 1, lastColumn + 1);
+
+        for (int row = initialRow; row <= finalRow; row++) {
+            for (int col = initialColumn; col <= finalColumn; col++) {
+                if (preparationfield[row][col] == Cell.SHIP) {
+                    return true;
+                }
             }
         }
+        return false;
     }
+
+    private static boolean isOutBounds(int row, int coliumn) {
+        return (row < 0 || row >= FILES_FIELD ||
+                coliumn < 0 || coliumn >= COLUMNS_FIELD);
+    }
+
     //endregion
-
-    //Two validation methods.
-    // region Adjacent and in bounds coordinates
-    private static boolean isAdjacentShip(char row,
-                                          int column,
-                                          char[][] battleField) {
-
-        int actualRow = row - ADJUSTASCII;
-
-        return (actualRow > 0 && battleField[actualRow - 1][column] == CELL_WITH_SHIP) ||
-                (actualRow < battleField.length - 1 && battleField[actualRow + 1][column] == CELL_WITH_SHIP)
-                || (column > 0 && battleField[actualRow][column - 1] == CELL_WITH_SHIP)
-                || (column < COLUMNS_FIELD && battleField[actualRow][column + 1] == CELL_WITH_SHIP);
-    }
-
-    private static boolean isInvalidCoordinate(char row, int column) {
-        return row < 'A' || row > 'J' || column < 1 || column > COLUMNS_FIELD;
-    }
-    //endregion*/
 
     //region Creates empty battlefield. Final method
     private static Cell[][] createEmptyField() {
+//BUG: Don't override SHIPS_GRID
+        Cell[][] battlefield = new Cell[FILES_FIELD][COLUMNS_FIELD];
 
-        Cell[][] battleField = new Cell[FILES_FIELD][COLUMNS_FIELD];
-
-        for (Cell[] row : battleField)
-            for (int j = 0; j < COLUMNS_FIELD; j++) {
+        for (Cell[] row : battlefield)
+            /*for (int j = 0; j < COLUMNS_FIELD; j++) {
                 row[j] = Cell.FOG;
-            }
-        return battleField;
+            }*/
+            Arrays.fill(row, Cell.FOG);
+
+        for (Ships[] row : SHIPS_GRID)
+            /*
+            for (int j = 0; j < COLUMNS_FIELD; j++) {
+                row[j] = null;
+            }*/
+            Arrays.fill(row, null);
+
+        return battlefield;
     }
     //endregion
 
     //region print battlefield. Final method
-    private static void printBattleField(Cell[][] battleField) {
+    private static void printBattleField(Cell[][] battlefield) {
         System.out.print(" ");
 
         for (int i = 1; i <= COLUMNS_FIELD; i++) {
@@ -262,10 +285,11 @@ public class Main {
             System.out.printf("%s ", letter);
 
             for (int j = 0; j < COLUMNS_FIELD; j++) {
-                System.out.printf("%c ", battleField[i][j].getSymbol());
+                System.out.printf("%c ", battlefield[i][j].getSymbol());
             }
             System.out.println();
         }
+        System.out.println();
     }
     //endregion
 }
